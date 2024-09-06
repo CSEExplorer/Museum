@@ -33,8 +33,22 @@ from django.views.decorators.http import require_POST
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Museum
-from .serializers import MuseumSerializer
+from .serializers import MuseumSerializer, TimeSlotSerializer
 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import Museum, TimeSlot
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import Museum, TimeSlot
+from .serializers import TimeSlotSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework import status
+from django.core.mail import send_mail
+from django.conf import settings
+from .models import TimeSlot, Museum
 
 def index(request):
     return render(request, 'index.html')
@@ -137,6 +151,84 @@ def museum_list(request):
     museums = Museum.objects.filter(city__name__icontains=city)
     serializer = MuseumSerializer(museums, many=True)
     return Response(serializer.data)
+
+
+
+
+
+@api_view(['GET'])
+def get_available_time_slots(request, museum_id):
+    try:
+        museum = Museum.objects.get(id=museum_id)
+        time_slots = TimeSlot.objects.filter(museum=museum)
+        serializer = TimeSlotSerializer(time_slots, many=True)
+        return Response(serializer.data)
+    except Museum.DoesNotExist:
+        return Response({"error": "Museum not found"}, status=404)
+
+
+# views.py
+@api_view(['POST'])
+def book_tickets(request):
+    slot_id = request.data.get('slot_id')
+    num_tickets = int(request.data.get('num_tickets'))
+
+    time_slot = TimeSlot.objects.get(id=slot_id)
+
+    if time_slot.available_tickets >= num_tickets:
+        time_slot.available_tickets -= num_tickets
+        time_slot.save()
+        return Response({"message": "Booking successful"})
+    else:
+        return Response({"message": "Not enough tickets available"}, status=400)
+    
+
+
+# views.py
+
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def book_ticket(request, museum_id):
+    slot_id = request.data.get('slot_id')
+    email = request.data.get('email')  # Get email from the request
+
+    try:
+        museum = Museum.objects.get(id=museum_id)
+        time_slot = TimeSlot.objects.get(id=slot_id, museum=museum)
+
+        if time_slot.available_tickets <= 0:
+            return Response({'error': 'No tickets available for this time slot'}, status=status.HTTP_400_BAD_REQUEST)
+
+        time_slot.available_tickets -= 1
+        time_slot.save()
+
+        subject = 'Ticket Booking Confirmation'
+        message = f"""
+        Dear {request.user.username},
+
+        Your ticket has been successfully booked for {museum.name}.
+        
+        Details:
+        - Date: {timezone.now().strftime('%Y-%m-%d')}
+        - Time Slot: {time_slot.start_time} - {time_slot.end_time}
+        - Status: Paid
+        
+        Thank you for booking with us!
+
+        Best regards,
+        The Museum Team
+        """
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
+
+        return Response({'message': 'Booking confirmed and email sent!'}, status=status.HTTP_200_OK)
+    except Museum.DoesNotExist:
+        return Response({'error': 'Museum not found'}, status=status.HTTP_404_NOT_FOUND)
+    except TimeSlot.DoesNotExist:
+        return Response({'error': 'Time slot not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
 
 
 

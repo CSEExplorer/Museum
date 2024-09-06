@@ -20,8 +20,8 @@ class CityAdmin(admin.ModelAdmin):
     search_fields = ('name', 'state')
 
 class TimeSlotAdmin(admin.ModelAdmin):
-    list_display = ('museum', 'start_time', 'end_time')
-    list_filter = ('museum',)
+    list_display = ('museum', 'start_time', 'end_time','available_tickets')
+    list_filter = ('museum','start_time')
 
 class ClosingDayAdmin(admin.ModelAdmin):
     list_display = ('museum', 'day')

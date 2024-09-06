@@ -10,3 +10,9 @@ class MuseumSerializer(serializers.ModelSerializer):
     class Meta:
         model = Museum
         fields = ['id', 'name', 'fare', 'address', 'city', 'other_details', 'image', 'time_slots', 'closing_days']
+   
+
+class TimeSlotSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TimeSlot
+        fields = ['id', 'start_time', 'end_time', 'available_tickets']

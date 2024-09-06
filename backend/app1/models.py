@@ -22,6 +22,8 @@ class TimeSlot(models.Model):
     museum = models.ForeignKey(Museum, on_delete=models.CASCADE, related_name='time_slots')
     start_time = models.TimeField()
     end_time = models.TimeField()
+    available_tickets = models.IntegerField(default=100)
+    
 
     def __str__(self):
         return f"{self.start_time} - {self.end_time}"
@@ -32,3 +34,5 @@ class ClosingDay(models.Model):
 
     def __str__(self):
         return self.day
+    
+
