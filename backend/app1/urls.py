@@ -6,7 +6,7 @@ from django.urls import path
 from .views import signup, login_view, logout_view,get_available_time_slots, book_tickets
 
 urlpatterns = [
-    path('index', views.index, name='index'),
+    path('', views.index, name='index'),
     path('api/signup/', signup, name='signup'),
     path('api/login/', login_view, name='login'),
     path('api/logout/', logout_view, name='logout'),
@@ -14,7 +14,4 @@ urlpatterns = [
     path('api/museums/', views.museum_list, name='museum-list'),
     path('api/museums/<int:museum_id>/slots/', get_available_time_slots, name='get_time_slots'),
     path('api/book-tickets/', book_tickets, name='book_tickets'),
-    
-
-  
 ]
