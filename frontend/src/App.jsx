@@ -15,6 +15,7 @@ import Signout from './Buttons/Signout';
 import ProfileAccount from './Buttons/ProfileAccount';
 import Tickets from './Buttons/Tickets';
 import Explore from './Buttons/Explore';
+import Places from './Buttons/Place';
 
 function App() {
   return (
@@ -23,6 +24,8 @@ function App() {
       <Routes>
         <Route path="/" element={<><Cart /><Advertisement /><Review /></>} />
         <Route path="/information" element={<Information />} />
+        <Route path="/places" element={<Places/>} />
+
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/help" element={<Help />} />

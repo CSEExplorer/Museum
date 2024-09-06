@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-import museum1 from './museum1.jpg'; // Adjust path as needed
-import museum2 from './museum2.jpg'; // Adjust path as needed
-import museum3 from './museum3.jpg'; // Adjust path as needed
+// import museum1 from '../assets/images/museum1.jpg'; // Adjust path as needed
+// import museum2 from '../assets/images/museum2.jpg'; // Adjust path as needed
+// import museum3 from '../assets/images/museum3.jpg'; // Adjust path as needed
 
 const Cart = () => {
-  const images = [museum1, museum2, museum3];
+  const images = [
+    '/static/assets/images/museum1.jpg',
+    '/static/assets/images/museum2.jpg',
+    '/static/assets/images/museum3.jpg'
+  ];
 
   const [cardImages, setCardImages] = useState([]);
 

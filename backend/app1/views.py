@@ -30,6 +30,10 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from django.http import JsonResponse
 import logging
 from django.views.decorators.http import require_POST
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import Museum
+from .serializers import MuseumSerializer
 
 
 def index(request):
@@ -124,5 +128,15 @@ class profile_view(APIView):
             # Add more fields as needed
         }
         return Response(user_data)
+    
+
+
+@api_view(['GET'])
+def museum_list(request):
+    city = request.GET.get('city', '')
+    museums = Museum.objects.filter(city__name__icontains=city)
+    serializer = MuseumSerializer(museums, many=True)
+    return Response(serializer.data)
+
 
 

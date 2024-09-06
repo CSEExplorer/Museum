@@ -11,7 +11,8 @@ urlpatterns = [
     path('api/login/', login_view, name='login'),
     path('api/logout/', logout_view, name='logout'),
     path('api/profile/', views.profile_view.as_view() , name='profile'),
-
+    path('api/museums/', views.museum_list, name='museum-list'),
+    
 
   
 ]

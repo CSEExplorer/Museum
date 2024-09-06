@@ -1,5 +1,6 @@
 import React from 'react';
-import museum1 from './museum1.jpg';
+import museum1 from '../assets/images/museum1.jpg';
+
 
 const Information = () => {
   return (

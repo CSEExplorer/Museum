@@ -39,8 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'app1', 
-    'rest_framework.authtoken',  # Your Django app
+     
+    'rest_framework.authtoken',
+    'app1.apps.App1Config'  # Your Django app
 ]
 
 MIDDLEWARE = [
@@ -139,7 +140,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS=[os.path.join(BASE_DIR, 'static')]
-STATIC_ROOT=os.path.join(BASE_DIR, 'assets')
+# STATIC_ROOT=os.path.join(BASE_DIR, 'assests')
 MEDIA_URL= '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Default primary key field type
