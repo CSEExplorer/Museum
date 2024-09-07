@@ -3,7 +3,7 @@
 from django.urls import path
 from . import views
 from django.urls import path
-from .views import signup, login_view, logout_view,get_available_time_slots, book_tickets
+from .views import signup, login_view, logout_view,get_available_time_slots
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -13,5 +13,5 @@ urlpatterns = [
     path('api/profile/', views.profile_view.as_view() , name='profile'),
     path('api/museums/', views.museum_list, name='museum-list'),
     path('api/museums/<int:museum_id>/slots/', get_available_time_slots, name='get_time_slots'),
-    path('api/book-tickets/', book_tickets, name='book_tickets'),
+    path('api/museums/<int:museum_id>/book/', views.book_ticket, name='book_ticket'), 
 ]

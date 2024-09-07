@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';  // Import useNavigate
 import { Modal, Button } from 'react-bootstrap';
 
 const Places = () => {
-  const [museums, setMuseums] = useState([]);  // Store museum data
-  const [loading, setLoading] = useState(false);  // Manage loading state
-  const [error, setError] = useState(null);    // Manage error state
-  const [searchParams, setSearchParams] = useSearchParams();  // Get query params from URL
-  const [selectedMuseum, setSelectedMuseum] = useState(null);  // Store selected museum for booking
-  const [timeSlots, setTimeSlots] = useState([]);  // Store time slots
-  const [showModal, setShowModal] = useState(false);  // Modal visibility
-  const [selectedSlot, setSelectedSlot] = useState(null);  // Store selected time slot for booking
-  const [city, setCity] = useState(searchParams.get('city') || '');  // Get city from search params
+  const [museums, setMuseums] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [city, setCity] = useState(searchParams.get('city') || '');
+  const navigate = useNavigate();  // Initialize useNavigate
 
-  // Fetch museums when the city query changes
   useEffect(() => {
     const fetchMuseums = async () => {
       if (!city) return;
@@ -34,40 +30,13 @@ const Places = () => {
     fetchMuseums();
   }, [city]);
 
-  // Handle search bar input
   const handleSearch = (event) => {
     setCity(event.target.value);
     setSearchParams({ city: event.target.value });
   };
 
-  // Fetch time slots when "Book Ticket" is clicked
-  const handleBookTicket = async (museum) => {
-    setSelectedMuseum(museum);
-    setShowModal(true);  // Show modal
-    setTimeSlots([]);  // Clear previous time slots
-
-    try {
-      const response = await axios.get(`http://127.0.0.1:8000/api/museums/${museum.id}/slots/`);
-      setTimeSlots(response.data);
-    } catch (err) {
-      setError('Failed to fetch time slots. Please try again.');
-    }
-  };
-
-  // Handle booking confirmation
-  const handleConfirmBooking = async () => {
-    if (!selectedSlot) return;
-
-    try {
-      // Send booking request to the API
-      const response = await axios.post(`http://127.0.0.1:8000/api/museums/${selectedMuseum.id}/book/`, {
-        slot_id: selectedSlot.id,
-      });
-      alert('Booking successful!');
-      setShowModal(false);  // Close modal
-    } catch (err) {
-      alert('Booking failed. Please try again.');
-    }
+  const handleBookTicket = (museum) => {
+    navigate('/booking', { state: { museum } });  // Redirect to booking page with museum data
   };
 
   return (
@@ -114,46 +83,6 @@ const Places = () => {
           </div>
         ))}
       </div>
-
-      {/* Modal to select time slots */}
-      {selectedMuseum && (
-        <Modal show={showModal} onHide={() => setShowModal(false)}>
-          <Modal.Header closeButton>
-            <Modal.Title>Book Ticket for {selectedMuseum.name}</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <h5>Select a Time Slot:</h5>
-            {timeSlots.length > 0 ? (
-              <ul className="list-group">
-                {timeSlots.map((slot) => (
-                  <li
-                    key={slot.id}
-                    className={`list-group-item ${selectedSlot && selectedSlot.id === slot.id ? 'active' : ''}`}
-                    onClick={() => setSelectedSlot(slot)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    {slot.start_time} - {slot.end_time} (Tickets Available: {slot.available_tickets})
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No available time slots</p>
-            )}
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowModal(false)}>
-              Close
-            </Button>
-            <Button
-              variant="primary"
-              onClick={handleConfirmBooking}
-              disabled={!selectedSlot}  // Disable button if no time slot is selected
-            >
-              Confirm Booking
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      )}
     </div>
   );
 };

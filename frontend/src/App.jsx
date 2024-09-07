@@ -18,6 +18,7 @@ import ProfileAccount from './Buttons/ProfileAccount';
 import Tickets from './Buttons/Tickets';
 import Explore from './Buttons/Explore';
 import Places from './Buttons/Place';
+import Booking from './Buttons/Booking';
 
 
 
@@ -29,7 +30,7 @@ function App() {
         <Route path="/" element={<><Cart /><Advertisement /><Review /></>} />
         <Route path="/information" element={<Information />} />
         <Route path="/places" element={<Places/>} />
-       
+       <Route path="/booking" element={<Booking/>}/>
      
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />

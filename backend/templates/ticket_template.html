@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .ticket {
+      border: 1px solid black;
+      padding: 20px;
+      margin: 20px;
+    }
+    .ticket h1 {
+      text-align: center;
+    }
+    .ticket-details {
+      margin-top: 20px;
+    }
+    .ticket-details p {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="ticket">
+    <h1>Booking Confirmation</h1>
+    <p>Thank you for booking at {{ museum.name }}.</p>
+
+    <div class="ticket-details">
+      <p><strong>Museum:</strong> {{ museum.name }}</p>
+      <p><strong>Slot:</strong> {{ time_slot.start_time }} - {{ time_slot.end_time }}</p>
+      <p><strong>Fare:</strong> ${{ museum.fare }}</p>
+    </div>
+  </div>
+</body>
+</html>

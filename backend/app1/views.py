@@ -49,6 +49,19 @@ from rest_framework import status
 from django.core.mail import send_mail
 from django.conf import settings
 from .models import TimeSlot, Museum
+from django.core.mail import send_mail
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from .models import Museum, TimeSlot
+from rest_framework.decorators import api_view
+from rest_framework import status
+from django.core.mail import EmailMessage
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+from django.conf import settings
+from xhtml2pdf import pisa
+from io import BytesIO
+
 
 def index(request):
     return render(request, 'index.html')
@@ -167,21 +180,7 @@ def get_available_time_slots(request, museum_id):
         return Response({"error": "Museum not found"}, status=404)
 
 
-# views.py
-@api_view(['POST'])
-def book_tickets(request):
-    slot_id = request.data.get('slot_id')
-    num_tickets = int(request.data.get('num_tickets'))
 
-    time_slot = TimeSlot.objects.get(id=slot_id)
-
-    if time_slot.available_tickets >= num_tickets:
-        time_slot.available_tickets -= num_tickets
-        time_slot.save()
-        return Response({"message": "Booking successful"})
-    else:
-        return Response({"message": "Not enough tickets available"}, status=400)
-    
 
 
 # views.py
@@ -189,44 +188,53 @@ def book_tickets(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def book_ticket(request, museum_id):
+    museum = get_object_or_404(Museum, pk=museum_id)
     slot_id = request.data.get('slot_id')
-    email = request.data.get('email')  # Get email from the request
+    email = request.data.get('email')
 
     try:
-        museum = Museum.objects.get(id=museum_id)
         time_slot = TimeSlot.objects.get(id=slot_id, museum=museum)
+    except TimeSlot.DoesNotExist:
+        return JsonResponse({"error": "Time slot does not exist."}, status=status.HTTP_404_NOT_FOUND)
 
-        if time_slot.available_tickets <= 0:
-            return Response({'error': 'No tickets available for this time slot'}, status=status.HTTP_400_BAD_REQUEST)
-
+    # Decrement available tickets
+    if time_slot.available_tickets > 0:
         time_slot.available_tickets -= 1
         time_slot.save()
+    else:
+        return JsonResponse({"error": "No tickets available for this slot."}, status=status.HTTP_400_BAD_REQUEST)
 
-        subject = 'Ticket Booking Confirmation'
-        message = f"""
-        Dear {request.user.username},
+    # Render HTML template to a string
+    html = render_to_string('ticket_template.html', {'museum': museum, 'time_slot': time_slot})
 
-        Your ticket has been successfully booked for {museum.name}.
-        
-        Details:
-        - Date: {timezone.now().strftime('%Y-%m-%d')}
-        - Time Slot: {time_slot.start_time} - {time_slot.end_time}
-        - Status: Paid
-        
-        Thank you for booking with us!
+    # Generate PDF
+    pdf_buffer = BytesIO()
+    pisa_status = pisa.CreatePDF(html, dest=pdf_buffer)
 
-        Best regards,
-        The Museum Team
-        """
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
+    if pisa_status.err:
+        return JsonResponse({"error": "Failed to generate PDF."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return Response({'message': 'Booking confirmed and email sent!'}, status=status.HTTP_200_OK)
-    except Museum.DoesNotExist:
-        return Response({'error': 'Museum not found'}, status=status.HTTP_404_NOT_FOUND)
-    except TimeSlot.DoesNotExist:
-        return Response({'error': 'Time slot not found'}, status=status.HTTP_404_NOT_FOUND)
+    pdf_buffer.seek(0)
+    pdf_file = pdf_buffer.read()
+
+    # Send email with PDF attachment
+    email_message = EmailMessage(
+        subject='Booking Confirmation',
+        body='Your ticket is attached as a PDF.',
+        from_email='your_email@gmail.com',
+        to=[email],
+    )
+
+    # Attach the PDF to the email
+    email_message.attach('ticket.pdf', pdf_file, 'application/pdf')
+    email_message.send()
+
+    return JsonResponse({"message": "Booking successful! Confirmation email with ticket sent."}, status=status.HTTP_200_OK)
+
+
+
+
 
 
 
