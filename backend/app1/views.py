@@ -1,67 +1,24 @@
 # views.py
-from urllib import response
-from django.contrib.auth import get_user_model
-from django.shortcuts import render
-# views.py in your Django app
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.contrib.auth.models import User
-from django.http import JsonResponse
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.response import Response
-import json
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from django.contrib.auth.models import User
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
-from django.http import JsonResponse
-from rest_framework.authtoken.models import Token
-from django.views.decorators.csrf import csrf_exempt
-import json
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from django.http import JsonResponse
-import logging
-from django.views.decorators.http import require_POST
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from .models import Museum
-from .serializers import MuseumSerializer, TimeSlotSerializer
-
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from .models import Museum, TimeSlot
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from .models import Museum, TimeSlot
-from .serializers import TimeSlotSerializer
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
-from rest_framework import status
-from django.core.mail import send_mail
-from django.conf import settings
-from .models import TimeSlot, Museum
-from django.core.mail import send_mail
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from .models import Museum, TimeSlot
-from rest_framework.decorators import api_view
-from rest_framework import status
-from django.core.mail import EmailMessage
-from django.http import JsonResponse
+from django.core.mail import send_mail, EmailMessage
 from django.template.loader import render_to_string
 from django.conf import settings
+from rest_framework import status
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.response import Response
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from .models import Museum, TimeSlot, UserProfile
+from .serializers import MuseumSerializer, TimeSlotSerializer, UserProfileSerializer
 from xhtml2pdf import pisa
 from io import BytesIO
-
+from django.shortcuts import render
+import json
+from django.views.decorators.csrf import csrf_exempt
+import logging
 
 def index(request):
     return render(request, 'index.html')
@@ -143,22 +100,9 @@ def logout_view(request):
 
     
 
-class profile_view(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        user = request.user
-        user_data = {
-            'username': user.username,
-            'email': user.email,
-            # Add more fields as needed
-        }
-        return Response(user_data)
-    
-
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def museum_list(request):
     city = request.GET.get('city', '')
     museums = Museum.objects.filter(city__name__icontains=city)
@@ -183,11 +127,11 @@ def get_available_time_slots(request, museum_id):
 
 
 
-# views.py
 
 
 
 @api_view(['POST'])
+
 def book_ticket(request, museum_id):
     museum = get_object_or_404(Museum, pk=museum_id)
     slot_id = request.data.get('slot_id')
@@ -231,6 +175,36 @@ def book_ticket(request, museum_id):
     email_message.send()
 
     return JsonResponse({"message": "Booking successful! Confirmation email with ticket sent."}, status=status.HTTP_200_OK)
+
+
+
+
+
+
+
+@api_view(['GET', 'PUT'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def get_user_profile(request):
+    try:
+        # Fetch user profile based on authenticated user
+        profile = UserProfile.objects.get(user=request.user)
+    except UserProfile.DoesNotExist:
+        return Response({'detail': 'Profile not found.'}, status=404)
+
+    if request.method == 'GET':
+        # Handle GET request
+        serializer = UserProfileSerializer(profile)
+        return Response(serializer.data)
+    
+    if request.method == 'PUT':
+        # Handle PUT request
+        serializer = UserProfileSerializer(profile, data=request.data, partial=True)  # `partial=True` allows partial updates
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
 
 
 

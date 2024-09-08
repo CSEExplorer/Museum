@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useSearchParams, useNavigate } from 'react-router-dom';  // Import useNavigate
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 
 const Places = () => {
@@ -9,7 +9,7 @@ const Places = () => {
   const [error, setError] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const [city, setCity] = useState(searchParams.get('city') || '');
-  const navigate = useNavigate();  // Initialize useNavigate
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMuseums = async () => {
@@ -36,7 +36,7 @@ const Places = () => {
   };
 
   const handleBookTicket = (museum) => {
-    navigate('/booking', { state: { museum } });  // Redirect to booking page with museum data
+    navigate('/booking', { state: { museum } });
   };
 
   return (

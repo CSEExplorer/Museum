@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-     
     'rest_framework.authtoken',
     'app1.apps.App1Config'  # Your Django app
 ]

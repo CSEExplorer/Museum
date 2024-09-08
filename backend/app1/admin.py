@@ -1,6 +1,9 @@
 from django.contrib import admin
 from .models import City, Museum, TimeSlot, ClosingDay
 
+from django.contrib import admin
+from .models import UserProfile
+
 class TimeSlotInline(admin.TabularInline):
     model = TimeSlot
     extra = 1  # Number of empty forms to display
@@ -27,6 +30,12 @@ class ClosingDayAdmin(admin.ModelAdmin):
     list_display = ('museum', 'day')
     list_filter = ('museum',)
 
+
+
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'phone_number', 'city', 'state')
+
+admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(City, CityAdmin)
 admin.site.register(Museum, MuseumAdmin)
 admin.site.register(TimeSlot, TimeSlotAdmin)
