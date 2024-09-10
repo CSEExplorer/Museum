@@ -1,12 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa'; // Import profile icon
-// import Logo from '../Buttons/Logo.jpg'; // Corrected path and extension
+import axios from 'axios';
 
 const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [profileImage, setProfileImage] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch profile image from backend if user is logged in
+    const fetchProfileImage = async () => {
+      const token = localStorage.getItem('token'); // Adjust token storage based on your auth logic
+      if (token) {
+        try {
+          const response = await axios.get('http://localhost:8000/api/user/profile/', {
+            headers: { Authorization: `Token ${token}` },
+          });
+          setProfileImage(response.data.profile_image); // Update with your actual API structure
+        } catch (error) {
+          console.error('Error fetching profile image:', error);
+        }
+      }
+    };
+
+    fetchProfileImage();
+  }, []);
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -63,8 +83,17 @@ const Header = () => {
               <button
                 className="btn btn-outline-light d-flex align-items-center"
                 onClick={toggleDropdown}
+                style={{ padding: '0', borderRadius: '50%', overflow: 'hidden', width: '40px', height: '40px' }} // Ensures circular container
               >
-                <FaUserCircle size={24} />
+                {profileImage ? (
+                  <img
+                    src={profileImage}
+                    alt="Profile"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} // Circular and responsive image
+                  />
+                ) : (
+                  <FaUserCircle size={30} color="white" />
+                )}
               </button>
 
               {dropdownOpen && (

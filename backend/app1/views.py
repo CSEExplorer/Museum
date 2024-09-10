@@ -19,7 +19,7 @@ from django.shortcuts import render
 import json
 from django.views.decorators.csrf import csrf_exempt
 import logging
-
+from django.contrib.auth.decorators import login_required
 def index(request):
     return render(request, 'index.html')
 
@@ -102,7 +102,7 @@ def logout_view(request):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+
 def museum_list(request):
     city = request.GET.get('city', '')
     museums = Museum.objects.filter(city__name__icontains=city)
@@ -131,7 +131,7 @@ def get_available_time_slots(request, museum_id):
 
 
 @api_view(['POST'])
-
+@permission_classes([IsAuthenticated])
 def book_ticket(request, museum_id):
     museum = get_object_or_404(Museum, pk=museum_id)
     slot_id = request.data.get('slot_id')
