@@ -54,5 +54,14 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.username
 
+class Booking(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    museum = models.ForeignKey(Museum, on_delete=models.CASCADE)
+    date_of_visit = models.DateField()
+    number_of_tickets = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.user.username} booked {self.number_of_tickets} tickets for {self.museum.name} on {self.date_of_visit}"
+
     
 

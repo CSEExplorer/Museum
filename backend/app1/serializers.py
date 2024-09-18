@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .models import Museum, City, TimeSlot, ClosingDay
+from .models import Museum, City, TimeSlot, ClosingDay,Booking,User
 
-from rest_framework import serializers
+
 from .models import UserProfile
 from django.contrib.auth.models import User
 
@@ -31,3 +31,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = ['username', 'email', 'phone_number', 'address', 'city', 'state','profile_image']
 
+
+
+
+class BookingSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Booking
+        fields = ['user', 'museum', 'date_of_visit', 'number_of_tickets']

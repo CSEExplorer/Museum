@@ -6,13 +6,13 @@ from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail, EmailMessage
 from django.template.loader import render_to_string
 from django.conf import settings
-from rest_framework import status
+from rest_framework import status,viewsets
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Museum, TimeSlot, UserProfile
-from .serializers import MuseumSerializer, TimeSlotSerializer, UserProfileSerializer
+from .models import Museum, TimeSlot, UserProfile,Booking
+from .serializers import MuseumSerializer, TimeSlotSerializer, UserProfileSerializer,BookingSerializer
 from xhtml2pdf import pisa
 from io import BytesIO
 from django.shortcuts import render
@@ -20,6 +20,8 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 import logging
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from rest_framework.authtoken.models import Token
 def index(request):
     return render(request, 'index.html')
 
@@ -79,7 +81,7 @@ def login_view(request):
 
 logger = logging.getLogger(__name__)
 
-from rest_framework.authtoken.models import Token
+
 
 @csrf_exempt
 def logout_view(request):
@@ -148,6 +150,15 @@ def book_ticket(request, museum_id):
         time_slot.save()
     else:
         return JsonResponse({"error": "No tickets available for this slot."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    booking = Booking(
+        date_of_visit = timezone.now().date() ,
+        user=request.user,  # Get the currently authenticated user
+        museum=museum,
+       
+        number_of_tickets=1  # Assuming 1 ticket per booking (adjust as needed)
+    )
+    booking.save()
 
     # Render HTML template to a string
     html = render_to_string('ticket_template.html', {'museum': museum, 'time_slot': time_slot})
@@ -204,7 +215,20 @@ def get_user_profile(request):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
+    
 
+    
+class BookingViewSet(viewsets.ModelViewSet):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+
+
+@api_view(['GET'])
+def check_login(request):
+    if request.user.is_authenticated:
+        return Response({'loggedIn': True}, status=status.HTTP_200_OK)
+    else:
+        return Response({'loggedIn': False}, status=status.HTTP_200_OK)
 
 
 
