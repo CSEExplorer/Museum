@@ -33,7 +33,7 @@ const ProfileAccount = () => {
                 setUserDetails(response.data);
                 setFormData(response.data);
                 if (response.data.profile_image) {
-                    setImagePreview(response.data.profile_image);
+                    setImagePreview(`${BASE_URL}${response.data.profile_image}`);
                 }
             } catch (error) {
                 console.error('Failed to fetch user details:', error);

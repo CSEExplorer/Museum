@@ -52,9 +52,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-
-  
-
 ]
 CORS_ALLOW_ALL_ORIGINS = True 
 
@@ -153,3 +150,10 @@ EMAIL_USE_TLS="True"
 EMAIL_PORT=587
 EMAIL_HOST_USER="saxenaaditya381@gmail.com"
 EMAIL_HOST_PASSWORD="jqof qptb ewgw gkgg"
+
+
+# settings.py
+
+RAZORPAY_KEY_ID = 'rzp_test_qRwrfdLBNDfLRV'
+RAZORPAY_KEY_SECRET = 'kjlZAL5kpTnQaRU1GI2YTpI5'
+

@@ -21,7 +21,10 @@ urlpatterns = [
     path('api/museums/<int:museum_id>/slots/', get_available_time_slots, name='get_time_slots'),
     path('api/museums/<int:museum_id>/book/', views.book_ticket, name='book_ticket'), 
     path('api/user/profile/', views.get_user_profile, name='get_user_profile'),
-     path('api/check-login/', check_login),
+    path('api/museums/<int:museum_id>/create_order/', views.create_order, name='create_order'),
+    path('api/send_email/',views.send_email,name='send_email'),
+    path('api/verify_payment/', views.verify_payment, name='verify_payment'),
+    path('api/check-login/', check_login),
     path('api/', include(router.urls)),
    
 ]

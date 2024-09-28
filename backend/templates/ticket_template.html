@@ -1,36 +1,43 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-    }
-    .ticket {
-      border: 1px solid black;
-      padding: 20px;
-      margin: 20px;
-    }
-    .ticket h1 {
-      text-align: center;
-    }
-    .ticket-details {
-      margin-top: 20px;
-    }
-    .ticket-details p {
-      margin: 5px 0;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .content {
+            margin-bottom: 20px;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: gray;
+        }
+    </style>
 </head>
 <body>
-  <div class="ticket">
-    <h1>Booking Confirmation</h1>
-    <p>Thank you for booking at {{ museum.name }}.</p>
-
-    <div class="ticket-details">
-      <p><strong>Museum:</strong> {{ museum.name }}</p>
-      <p><strong>Slot:</strong> {{ time_slot.start_time }} - {{ time_slot.end_time }}</p>
-      <p><strong>Fare:</strong> ${{ museum.fare }}</p>
+    <div class="header">
+        <h1>Booking Confirmation</h1>
     </div>
-  </div>
+    <div class="content">
+        <p>Dear User,</p>
+        <p>Thank you for booking with us! Below are your booking details:</p>
+        <p><strong>Museum:</strong> {{ museum.name }}</p>
+        <p><strong>Slot:</strong> {{ time_slot.start_time }} - {{ time_slot.end_time }}</p>
+        <p><strong>Fare:</strong> ${{ museum.fare }}</p>
+        <p><strong>Booking Date:</strong> {{ booking_date }}</p>
+        <p>If you have any questions, feel free to contact us.</p>
+    </div>
+    <div class="footer">
+        <p>Powered by [Your Company Name]</p>
+    </div>
 </body>
 </html>

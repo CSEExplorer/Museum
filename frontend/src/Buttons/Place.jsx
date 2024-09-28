@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
-
+const apiUrl = process.env.REACT_APP_API_URL;
 const Places = () => {
   const [museums, setMuseums] = useState([]);
   const [loading, setLoading] = useState(false);

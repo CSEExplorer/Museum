@@ -39,3 +39,14 @@ class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = ['user', 'museum', 'date_of_visit', 'number_of_tickets']
+
+
+# serializers.py
+
+from rest_framework import serializers
+from .models import Payment
+
+class PaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = '__all__'
